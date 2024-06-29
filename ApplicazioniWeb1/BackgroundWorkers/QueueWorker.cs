@@ -38,10 +38,20 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                         var freeCarSpot = freeCarSpots.FirstOrDefault();
                         if (freeCarSpot != null)
                         {
+
+                            var invoices = db.Invoices.Where(i => i.UserId == freeCarSpot.UserId && i.Paid == null).ToList();
+
+                            foreach(var invoice in invoices)
+                            {
+                                var time = freeCarSpot.EndLease - freeCarSpot.StartLease;
+                                invoice.Paid = time.Seconds * (invoice.Rate / 60 / 60);
+                            }
+
                             freeCarSpot.UserId = book.UserId;
                             freeCarSpot.StartLease = DateTime.UtcNow;
                             freeCarSpot.EndLease = DateTime.UtcNow.AddHours(book.TimeSpan);
                             book.Entered = true;
+
                         }
 
                         db.SaveChanges();
