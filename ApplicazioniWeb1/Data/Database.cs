@@ -54,12 +54,14 @@ namespace ApplicazioniWeb1.Data
         public DateTime EndLease { get; set; }
     }
 
-    [PrimaryKey(nameof(Date), nameof(UserId))]
+    [PrimaryKey(nameof(DateStart), nameof(UserId))]
     public class Invoice
     {
-        public DateTime Date { get; set; }
+        public DateTime DateStart { get; set; }
+        public DateTime DateEnd { get; set; }
         public string UserId { get; set; }
         public float? Paid { get; set; }
+        public float Value { get; set; }
         public string Type { get; set; }
         public float Rate { get; set; }
     }

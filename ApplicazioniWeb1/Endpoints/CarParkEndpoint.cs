@@ -147,11 +147,29 @@ namespace ApplicazioniWeb1.Endpoints
                 });
             }
 
+            var batteryToCharge = (user.Battery / 100) * (parkForm.TargetCharge - parkForm.CurrentCharge);
+            var costOfCharge = carPark.ChargeRate * batteryToCharge;
+            var time = batteryToCharge / carPark.Power;
+
+
             db.Invoices.AddRange(new List<Invoice>
                 {
-                    new Invoice() { Type = "Charge", Date = DateTime.UtcNow, UserId = user.Id, Rate = carPark.ChargeRate },
-                    new Invoice() { Type = "Parking", Date = DateTime.UtcNow, UserId = user.Id, Rate = carPark.ChargeRate},
-                });
+                    new Invoice() {
+                        Type = "Charge",
+                        DateStart = DateTime.UtcNow,
+                        DateEnd = DateTime.UtcNow.AddHours(time),
+                        UserId = user.Id,
+                        Rate = carPark.ChargeRate,
+                        Value = costOfCharge
+                    },
+                    new Invoice() { Type = "Parking",
+                        DateStart = DateTime.UtcNow,
+                        DateEnd = DateTime.UtcNow.AddHours(parkForm.Time),
+                        UserId = user.Id,
+                        Rate = carPark.ParkRate,
+                        Value = carPark.ParkRate * parkForm.Time
+                    },
+                }) ;
 
             db.SaveChanges();
 

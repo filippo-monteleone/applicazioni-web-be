@@ -20,7 +20,7 @@ namespace ApplicazioniWeb1.Endpoints
             return roles.Count() == 0 ? Results.NotFound() : Results.Ok(roles);
         }
 
-        public static async Task<IResult> PostHandler(InviteForm invite, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, HttpContext ctx)
+        public static async Task<IResult> PostHandler(InviteForm invite, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
 
@@ -33,6 +33,9 @@ namespace ApplicazioniWeb1.Endpoints
                 await roleManager.CreateAsync(new IdentityRole() { Name = "user" });
                 await userManager.AddToRoleAsync(user, "user");
             }
+
+            await signInManager.RefreshSignInAsync(user);
+
             return Results.Ok();
         }
     }

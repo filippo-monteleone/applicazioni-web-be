@@ -52,16 +52,8 @@ namespace ApplicazioniWeb1.Endpoints
 
             foreach (var i in invoices)
             {
-                var time = DateTime.UtcNow - i.Date;
-
-                if (i.Type == "Charge")
-                {
-                    i.Paid = time.Seconds * (carPark.ChargeRate / 60 / 60);
-                }
-                else if (i.Type == "Parking")
-                {
-                    i.Paid = time.Seconds * (carPark.ParkRate / 60 / 60);
-                }
+                var percentage =  (DateTime.UtcNow - i.DateStart).TotalSeconds / ((i.DateEnd - i.DateStart).TotalSeconds / 100) / 100;
+                i.Paid = (float?)((float)i.Value * percentage);
             }
 
             db.SaveChanges();
