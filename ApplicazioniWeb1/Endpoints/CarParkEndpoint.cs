@@ -147,7 +147,7 @@ namespace ApplicazioniWeb1.Endpoints
                 });
             }
 
-            var batteryToCharge = (user.Battery / 100) * (parkForm.TargetCharge - parkForm.CurrentCharge);
+            var batteryToCharge = (user.Battery / 100f) * (parkForm.TargetCharge - parkForm.CurrentCharge);
             var costOfCharge = carPark.ChargeRate * batteryToCharge;
             var time = batteryToCharge / carPark.Power;
 

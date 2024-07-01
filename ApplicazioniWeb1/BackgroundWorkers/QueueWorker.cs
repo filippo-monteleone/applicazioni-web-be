@@ -23,7 +23,7 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                 var db = scope.ServiceProvider.GetRequiredService<Database>();
 
                 var invoices = (from invoice in db.Invoices
-                                where invoice.Paid == null && invoice.DateEnd == DateTime.UtcNow
+                                where invoice.Paid == null && invoice.DateEnd <= DateTime.UtcNow
                                 select invoice).ToList();
 
                 foreach (var invoice in invoices)
