@@ -46,6 +46,9 @@ namespace ApplicazioniWeb1.Endpoints
                 return Results.NotFound();
             }
 
+            carSpot.UserId = null;
+            carSpot.EndLease = DateTime.UtcNow;
+
             var carPark = db.CarParks.FirstOrDefault(c => c.Id == carSpot.CarParkId);
 
             var invoices = db.Invoices.Where(i => i.UserId == user.Id && i.Paid == null);
