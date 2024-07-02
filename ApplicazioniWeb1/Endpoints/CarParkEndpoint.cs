@@ -289,6 +289,32 @@ namespace ApplicazioniWeb1.Endpoints
 
             var carPark = db.CarParks.FirstOrDefault(c => c.Id == carSpot.CarParkId);
 
+            var invoices = from invoice in db.Invoices
+                           where invoice.Paid == null && invoice.UserId == user.Id
+                           select invoice;
+
+            float? toPay = 0, park = 0;
+            double step = 0, parkStep = 0;
+            
+
+            foreach (var i in invoices)
+            {
+                if (i.Type == "Charge")
+                {
+                    var percentage = (DateTime.UtcNow - i.DateStart).TotalSeconds / ((i.DateEnd - i.DateStart).TotalSeconds / 100) / 100;
+                    toPay = (float?)((float)i.Value * percentage);
+                    step = i.Value / (i.DateEnd - i.DateStart).TotalSeconds;
+                }
+                else if (i.Type == "Parking")
+                {
+                    var percentage = (DateTime.UtcNow - i.DateStart).TotalSeconds / ((i.DateEnd - i.DateStart).TotalSeconds / 100) / 100;
+                    park = (float?)((float)i.Value * percentage);
+                    parkStep = i.Value / (i.DateEnd - i.DateStart).TotalSeconds;
+                }
+            }
+
+
+            var time = (carSpot.EndLease - carSpot.StartLease).TotalHours;
 
             return Results.Ok(new
             {
@@ -297,8 +323,12 @@ namespace ApplicazioniWeb1.Endpoints
                 ParkRate = carPark.ParkRate,
                 ChargeRate = carPark.ChargeRate,
                 InQueue = false,
-                EndParking = carSpot.EndLease
-            });
+                EndParking = carSpot.EndLease,
+                chargeCurrent = toPay + park,
+                stepCurrent = step,
+                stepPark = parkStep,
+
+            }) ;
         }
     }
 }
