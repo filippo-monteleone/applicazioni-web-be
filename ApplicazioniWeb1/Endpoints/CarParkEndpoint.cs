@@ -323,9 +323,6 @@ namespace ApplicazioniWeb1.Endpoints
                 }
             }
 
-
-            var time = (carSpot.EndLease - carSpot.StartLease).TotalHours;
-
             return Results.Ok(new
             {
                 Id = carPark.Id,
