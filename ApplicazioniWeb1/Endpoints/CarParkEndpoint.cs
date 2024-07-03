@@ -100,13 +100,18 @@ namespace ApplicazioniWeb1.Endpoints
             if (carPark == null || page <= 0)
                 return Results.NotFound();
 
-            var carSpots = db.CarSpots.Where(carSpot => carSpot.CarParkId == carPark.Id);
+            var carSpots = (db.CarSpots.Where(carSpot => carSpot.CarParkId == carPark.Id)).ToList();
 
             var pageCount = Math.Ceiling(carSpots.Count() / (float)resultsPerPage);
 
-            var paginatedCarSpots = await db.CarSpots
+            var paginatedCarSpots = carSpots
                 .Skip((page - 1) * (int)resultsPerPage)
-                .Take((int)resultsPerPage).ToListAsync();
+                .Take((int)resultsPerPage);
+
+            foreach (var spot in paginatedCarSpots)
+            {
+                if (spot.EndLease < DateTime.UtcNow) spot.UserId = null;
+            }
 
             return Results.Ok(new {
                 carSpots = paginatedCarSpots,
@@ -160,7 +165,9 @@ namespace ApplicazioniWeb1.Endpoints
                         DateEnd = DateTime.UtcNow.AddHours(time),
                         UserId = user.Id,
                         Rate = carPark.ChargeRate,
-                        Value = costOfCharge
+                        Value = costOfCharge,
+                        StartValue = parkForm.CurrentCharge,
+                        EndValue = parkForm.TargetCharge
                     },
                     new Invoice() { Type = "Parking",
                         DateStart = DateTime.UtcNow,
@@ -293,8 +300,8 @@ namespace ApplicazioniWeb1.Endpoints
                            where invoice.Paid == null && invoice.UserId == user.Id
                            select invoice;
 
-            float? toPay = 0, park = 0;
-            double step = 0, parkStep = 0;
+            float? toPay = 0, park = 0, battery = 0;
+            double step = 0, parkStep = 0, batteryStep = 0;
             
 
             foreach (var i in invoices)
@@ -304,6 +311,9 @@ namespace ApplicazioniWeb1.Endpoints
                     var percentage = (DateTime.UtcNow - i.DateStart).TotalSeconds / ((i.DateEnd - i.DateStart).TotalSeconds / 100) / 100;
                     toPay = (float?)((float)i.Value * percentage);
                     step = i.Value / (i.DateEnd - i.DateStart).TotalSeconds;
+                    batteryStep = (double)(i.EndValue - i.StartValue) / (i.DateEnd - i.DateStart).TotalSeconds;
+                    var charged = batteryStep * (DateTime.UtcNow - i.DateStart).TotalSeconds;
+                    battery = (float)charged + i.StartValue;
                 }
                 else if (i.Type == "Parking")
                 {
@@ -327,7 +337,8 @@ namespace ApplicazioniWeb1.Endpoints
                 chargeCurrent = toPay + park,
                 stepCurrent = step,
                 stepPark = parkStep,
-
+                batteryStep,
+                battery
             }) ;
         }
     }
