@@ -17,12 +17,13 @@ namespace ApplicazioniWeb1.Endpoints
         public static async Task<IResult> GetHandler(int page, int resultsPerPage, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
+            var carParks = db.CarParks.Where(c => c.OwnerId == user.Id).Select(c => c.Id.ToString());
 
-            var invoices = db.Invoices.Where(i => i.UserId == user.Id);
+            var invoices = db.Invoices.Where(i => carParks.Any(c => c == i.CarParkId));
 
             var pageCount = Math.Ceiling(invoices.Count() / (float)resultsPerPage);
 
-            var paginatedInvoices = await db.Invoices
+            var paginatedInvoices = await invoices
                 .Skip((page - 1) * (int)resultsPerPage)
                 .Take((int)resultsPerPage).ToListAsync();
 

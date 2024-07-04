@@ -60,6 +60,7 @@ namespace ApplicazioniWeb1.Data
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
         public string UserId { get; set; }
+        public string CarParkId { get; set; }
         public float? Paid { get; set; }
         public float Value { get; set; }
         public string Type { get; set; }
