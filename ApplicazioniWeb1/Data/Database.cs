@@ -65,6 +65,7 @@ namespace ApplicazioniWeb1.Data
         public float Value { get; set; }
         public string Type { get; set; }
         public float Rate { get; set; }
+        public bool Pro { get; set; }
         public float? StartValue { get; set; }
         public float? EndValue { get; set; }
     }
