@@ -1,6 +1,8 @@
 ﻿
 
 using ApplicazioniWeb1.Data;
+using Microsoft.EntityFrameworkCore;
+using static ApplicazioniWeb1.Endpoints.CarParkEndpoint;
 
 namespace ApplicazioniWeb1.BackgroundWorkers
 {
@@ -55,6 +57,42 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                             freeCarSpot.UserId = book.UserId;
                             freeCarSpot.StartLease = DateTime.UtcNow;
                             freeCarSpot.EndLease = DateTime.UtcNow.AddHours(book.TimeSpan);
+
+
+
+                            var user = db.Users.Where(u => u.Id == book.UserId).FirstOrDefault();
+                            var carPark = db.CarParks.Include(c => c.carSpots).SingleOrDefault(carPark => carPark.Id == freeCarSpot.CarParkId);
+
+
+                            var batteryToCharge = (user.Battery / 100f) * (book.TargetCharge - book.CurrentCharge);
+                            var costOfCharge = carPark.ChargeRate * batteryToCharge;
+                            var time = batteryToCharge / carPark.Power;
+
+                            db.Invoices.AddRange(new List<Invoice>
+                            {
+                                new Invoice() {
+                                    Type = "Charge",
+                                    DateStart = DateTime.UtcNow,
+                                    DateEnd = DateTime.UtcNow.AddHours(time),
+                                    UserId = user.Id,
+                                    Rate = carPark.ChargeRate,
+                                    Value = costOfCharge,
+                                    StartValue = book.CurrentCharge,
+                                    EndValue = book.TargetCharge,
+                                    CarParkId = carPark.Id.ToString(),
+                                    Pro = user.Pro
+                                },
+                                new Invoice() { Type = "Parking",
+                                    DateStart = DateTime.UtcNow,
+                                    DateEnd = DateTime.UtcNow.AddHours(book.Time),
+                                    UserId = user.Id,
+                                    Rate = carPark.ParkRate,
+                                    Value = carPark.ParkRate * book.Time,
+                                    CarParkId = carPark.Id.ToString(),
+                                    Pro = user.Pro
+                                },
+                            });
+
                             book.Entered = true;
                         }
 

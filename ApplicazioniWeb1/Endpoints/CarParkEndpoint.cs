@@ -143,7 +143,7 @@ namespace ApplicazioniWeb1.Endpoints
                     Date = DateTime.UtcNow,
                     CarParkId = carPark.Id,
                     Entered = false,
-                    TimeSpan = parkForm.Time
+                    TimeSpan = parkForm.Time,
                 });
                 db.SaveChanges();
                 return Results.Ok(new
@@ -221,14 +221,24 @@ namespace ApplicazioniWeb1.Endpoints
 
                     if (waitingUsers.TryAdd(user.Id, pos))
                     {
-                        await ctx.Response.WriteAsync($"data: {pos}\n\n");
+                        var text = JsonSerializer.Serialize(new {pos});
+
+                        await ctx.Response.WriteAsync($"data: {text}\n\n");
                         await ctx.Response.Body.FlushAsync();
 
                     }
                 }
                 else if (waitingUsers.ContainsKey(user.Id))
                 {
-                    await ctx.Response.WriteAsync($"data: {-1}\n\n");
+
+                    var carSpot = db.CarSpots.Where(c => c.UserId == user.Id && c.EndLease > DateTime.UtcNow).Single();
+
+                    var time = (carSpot.EndLease - carSpot.StartLease).TotalHours;
+
+                    var text = JsonSerializer.Serialize(new { pos = -1, time });
+
+
+                    await ctx.Response.WriteAsync($"data: {text}\n\n");
 
                     await ctx.Response.Body.FlushAsync();
 

@@ -80,5 +80,9 @@ namespace ApplicazioniWeb1.Data
         public DateTime Date { get; set; }
         public float TimeSpan { get; set; }
         public bool Entered { get; set; }
+        public float TargetCharge { get; set; }
+        public float CurrentCharge { get; set; }
+        public float Time { get; set; }
+
     }
 }
