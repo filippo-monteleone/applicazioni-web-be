@@ -25,21 +25,54 @@ namespace ApplicazioniWeb1.Endpoints
             public bool Premium { get; set; }
         }
 
-        public static async Task<IResult> GetHandler([FromQuery]Filter filter, int page, int resultsPerPage, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        public static async Task<IResult> GetHandler(
+            DateTime? Start, DateTime? End,
+            int page, int resultsPerPage, 
+            Database db, UserManager<ApplicationUser> userManager, HttpContext ctx,
+            bool Parking = true, bool Charging = true, bool Basic = true,
+            bool Premium = true)
         {
+            Start = DateTime.MinValue; End = DateTime.MaxValue;
             var user = await userManager.GetUserAsync(ctx.User);
             var carParks = db.CarParks.Where(c => c.OwnerId == user.Id).Select(c => c.Id.ToString());
 
-            var invoices = db.Invoices.Where(i => carParks.Any(c => c == i.CarParkId));
+            var invoices = db.Invoices.Include(i => i.User).Where(i => carParks.Any(c => c == i.CarParkId));
 
             var pageCount = Math.Ceiling(invoices.Count() / (float)resultsPerPage);
 
+            List<string> parking = new();
+            if (Parking)
+                parking.Add("Parking");
+            if (Charging)
+                parking.Add("Charge");
+
             var paginatedInvoices = await invoices
                 .Skip((page - 1) * (int)resultsPerPage)
-                .Take((int)resultsPerPage).ToListAsync();
+                .Take((int)resultsPerPage)
+                .ToListAsync();
+
+
+
+            var temp =  paginatedInvoices.Where(i => {
+                if (i.DateStart > Start && i.DateEnd < End)
+                {
+                    if (Premium && Basic && parking.Contains(i.Type))
+                    {
+                        return true;
+                    } else if (Premium && parking.Contains(i.Type))
+                    {
+                        return true;
+                    } else if (Basic && parking.Contains(i.Type))
+                    {
+                        return true;
+                    }
+
+                }
+                return false;
+            });
 
             return Results.Ok(new {
-                invoices = paginatedInvoices,
+                invoices = temp,
                 currentPage = page,
                 pages = (int)page,
                 length = invoices.Count()
