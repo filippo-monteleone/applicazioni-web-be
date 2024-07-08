@@ -14,7 +14,18 @@ namespace ApplicazioniWeb1.Endpoints
             public float CostOfCharge { get; set; }
             public float CostOfPark { get; set; }
         }
-        public static async Task<IResult> GetHandler(int page, int resultsPerPage, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+
+        public class Filter
+        {
+            public DateTime Start { get; set; }
+            public DateTime End { get; set; }
+            public bool Parking { get; set; }
+            public bool Charging { get; set; }
+            public bool Basic { get; set; }
+            public bool Premium { get; set; }
+        }
+
+        public static async Task<IResult> GetHandler([FromQuery]Filter filter, int page, int resultsPerPage, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
             var carParks = db.CarParks.Where(c => c.OwnerId == user.Id).Select(c => c.Id.ToString());
