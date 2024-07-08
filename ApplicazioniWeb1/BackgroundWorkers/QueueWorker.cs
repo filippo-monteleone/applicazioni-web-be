@@ -56,7 +56,6 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                         {
                             freeCarSpot.UserId = book.UserId;
                             freeCarSpot.StartLease = DateTime.UtcNow;
-                            freeCarSpot.EndLease = DateTime.UtcNow.AddHours(book.TimeSpan);
 
 
 
@@ -67,6 +66,9 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                             var batteryToCharge = (user.Battery / 100f) * (book.TargetCharge - book.CurrentCharge);
                             var costOfCharge = carPark.ChargeRate * batteryToCharge;
                             var time = batteryToCharge / carPark.Power;
+
+                            freeCarSpot.EndLease = DateTime.UtcNow.AddHours(book.TimePark + time);
+
 
                             db.Invoices.AddRange(new List<Invoice>
                             {
@@ -84,10 +86,10 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                                 },
                                 new Invoice() { Type = "Parking",
                                     DateStart = DateTime.UtcNow,
-                                    DateEnd = DateTime.UtcNow.AddHours(book.Time),
+                                    DateEnd = DateTime.UtcNow.AddHours(book.TimePark + time),
                                     UserId = user.Id,
                                     Rate = carPark.ParkRate,
-                                    Value = carPark.ParkRate * book.Time,
+                                    Value = carPark.ParkRate * (book.TimePark + time),
                                     CarParkId = carPark.Id.ToString(),
                                     Pro = user.Pro
                                 },

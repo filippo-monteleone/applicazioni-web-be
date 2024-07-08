@@ -78,11 +78,11 @@ namespace ApplicazioniWeb1.Data
         [ForeignKey(nameof(CarPark))]
         public int CarParkId { get; set; }
         public DateTime Date { get; set; }
-        public float TimeSpan { get; set; }
+        public float TimeCharge { get; set; }
+        public float TimePark { get; set; }
         public bool Entered { get; set; }
         public float TargetCharge { get; set; }
         public float CurrentCharge { get; set; }
-        public float Time { get; set; }
 
     }
 }

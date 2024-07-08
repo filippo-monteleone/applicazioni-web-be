@@ -28,7 +28,8 @@ namespace ApplicazioniWeb1.Endpoints
         {
             public float CurrentCharge { get; set; }
             public float TargetCharge { get; set; }
-            public float Time { get; set; }
+            public float TimeCharge { get; set; }
+            public float TimePark { get; set; }
         }
 
         [Authorize(Roles = "admin")]
@@ -143,7 +144,10 @@ namespace ApplicazioniWeb1.Endpoints
                     Date = DateTime.UtcNow,
                     CarParkId = carPark.Id,
                     Entered = false,
-                    TimeSpan = parkForm.Time,
+                    TimeCharge = parkForm.TimeCharge,
+                    TimePark = parkForm.TimePark,
+                    TargetCharge = parkForm.TargetCharge,
+                    CurrentCharge = parkForm.CurrentCharge,
                 });
                 db.SaveChanges();
                 return Results.Ok(new
@@ -155,7 +159,6 @@ namespace ApplicazioniWeb1.Endpoints
             var batteryToCharge = (user.Battery / 100f) * (parkForm.TargetCharge - parkForm.CurrentCharge);
             var costOfCharge = carPark.ChargeRate * batteryToCharge;
             var time = batteryToCharge / carPark.Power;
-
 
             db.Invoices.AddRange(new List<Invoice>
                 {
@@ -173,10 +176,10 @@ namespace ApplicazioniWeb1.Endpoints
                     },
                     new Invoice() { Type = "Parking",
                         DateStart = DateTime.UtcNow,
-                        DateEnd = DateTime.UtcNow.AddHours(parkForm.Time),
+                        DateEnd = DateTime.UtcNow.AddHours(parkForm.TimePark + time),
                         UserId = user.Id,
                         Rate = carPark.ParkRate,
-                        Value = carPark.ParkRate * parkForm.Time,
+                        Value = carPark.ParkRate * parkForm.TimePark,
                         CarParkId = id.ToString(),
                         Pro = user.Pro
                     },
@@ -186,7 +189,7 @@ namespace ApplicazioniWeb1.Endpoints
 
             freeSpot.UserId = user.Id;
             freeSpot.StartLease = DateTime.UtcNow;
-            freeSpot.EndLease = DateTime.UtcNow.AddHours(parkForm.Time);
+            freeSpot.EndLease = DateTime.UtcNow.AddHours(parkForm.TimePark + time);
 
             db.SaveChanges();
 
