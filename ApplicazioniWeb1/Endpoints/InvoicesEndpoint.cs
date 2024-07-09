@@ -36,9 +36,8 @@ namespace ApplicazioniWeb1.Endpoints
             var user = await userManager.GetUserAsync(ctx.User);
             var carParks = db.CarParks.Where(c => c.OwnerId == user.Id).Select(c => c.Id.ToString());
 
-            var invoices = db.Invoices.Include(i => i.User).Where(i => carParks.Any(c => c == i.CarParkId));
+            var invoices = db.Invoices.Include(i => i.User).Where(i => carParks.Any(c => c == i.CarParkId)).ToArray();
 
-            var pageCount = Math.Ceiling(invoices.Count() / (float)resultsPerPage);
 
             List<string> parking = new();
             if (Parking)
@@ -46,36 +45,40 @@ namespace ApplicazioniWeb1.Endpoints
             if (Charging)
                 parking.Add("Charge");
 
-            var paginatedInvoices = await invoices
-                .Skip((page - 1) * (int)resultsPerPage)
-                .Take((int)resultsPerPage)
-                .ToListAsync();
-
-
-
-            var temp =  paginatedInvoices.Where(i => {
+            var temp = invoices.Where(i => {
                 if (i.DateStart > Start && i.DateEnd < End)
                 {
                     if (Premium && Basic && parking.Contains(i.Type))
                     {
                         return true;
-                    } else if (Premium && parking.Contains(i.Type))
-                    {
-                        return true;
-                    } else if (Basic && parking.Contains(i.Type))
-                    {
-                        return true;
                     }
-
+                    else if (Premium && parking.Contains(i.Type))
+                    {
+                        if (i.Pro)
+                            return true;
+                        else
+                            return false;
+                    }
+                    else if (Basic && parking.Contains(i.Type))
+                    {
+                        if (!i.Pro) return true;
+                        else return false;
+                    }
                 }
                 return false;
             });
 
+            var pageCount = Math.Ceiling(temp.Count() / (float)resultsPerPage);
+
+            var paginatedInvoices = temp
+                .Skip((page - 1) * (int)resultsPerPage)
+                .Take((int)resultsPerPage);
+
             return Results.Ok(new {
-                invoices = temp,
+                invoices = paginatedInvoices,
                 currentPage = page,
                 pages = (int)page,
-                length = invoices.Count()
+                length = temp.Count()
             });
 
         }
