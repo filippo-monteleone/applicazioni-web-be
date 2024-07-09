@@ -75,6 +75,7 @@ apiEndpoints.MapGet("/role", RoleEndpoint.Handler);
 apiEndpoints.MapPost("/role", RoleEndpoint.PostHandler);
 
 apiEndpoints.MapGet("/car-park", CarParkEndpoint.GetHandler);
+apiEndpoints.MapPut("/car-park/{id}", CarParkEndpoint.PutPark);
 apiEndpoints.MapPost("/car-park", CarParkEndpoint.PostHandler);
 apiEndpoints.MapGet("/car-park/{id}/car-spots", CarParkEndpoint.GetCarSpotHandler);
 apiEndpoints.MapDelete("/car-park/{id}", CarParkEndpoint.DeleteHandler);

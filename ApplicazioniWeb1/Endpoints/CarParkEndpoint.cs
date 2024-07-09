@@ -32,6 +32,28 @@ namespace ApplicazioniWeb1.Endpoints
             public float TimePark { get; set; }
         }
 
+        public class UpdatePark
+        {
+            public float ParkRate { get; set; }
+            public float ChargeRate { get; set; }
+        }
+
+        [Authorize(Roles = "admin")]
+        public static async Task<IResult> PutPark(int id, UpdatePark parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        {
+            var user = await userManager.GetUserAsync(ctx.User);
+
+            var c = db.CarParks.Where(c => c.OwnerId == user.Id && c.Id == id).Single();
+
+            c.ParkRate = parkForm.ParkRate;
+            c.ChargeRate = parkForm.ChargeRate;
+
+            db.SaveChanges();
+
+            return Results.Ok();
+        }
+
+
         [Authorize(Roles = "admin")]
         public static async Task<IResult> PostHandler(CarPark carPark, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
@@ -71,6 +93,7 @@ namespace ApplicazioniWeb1.Endpoints
             return Results.Ok(carParks);
 
         }
+
 
         [Authorize(Roles = "admin")]
         public static async Task<IResult> DeleteHandler(Database db, int id, UserManager<ApplicationUser> userManager, HttpContext ctx)
