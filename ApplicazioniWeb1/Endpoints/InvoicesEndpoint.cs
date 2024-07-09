@@ -26,13 +26,14 @@ namespace ApplicazioniWeb1.Endpoints
         }
 
         public static async Task<IResult> GetHandler(
-            DateTime? Start, DateTime? End,
+            DateTime? StartDate, DateTime? EndDate,
             int page, int resultsPerPage, 
             Database db, UserManager<ApplicationUser> userManager, HttpContext ctx,
             bool Parking = true, bool Charging = true, bool Basic = true,
             bool Premium = true)
         {
-            Start = DateTime.MinValue; End = DateTime.MaxValue;
+
+            StartDate ??= DateTime.MinValue; EndDate ??= DateTime.MaxValue;
             var user = await userManager.GetUserAsync(ctx.User);
             var carParks = db.CarParks.Where(c => c.OwnerId == user.Id).Select(c => c.Id.ToString());
 
@@ -46,7 +47,7 @@ namespace ApplicazioniWeb1.Endpoints
                 parking.Add("Charge");
 
             var temp = invoices.Where(i => {
-                if (i.DateStart > Start && i.DateEnd < End)
+                if (i.DateStart > StartDate && i.DateEnd < EndDate)
                 {
                     if (Premium && Basic && parking.Contains(i.Type))
                     {
