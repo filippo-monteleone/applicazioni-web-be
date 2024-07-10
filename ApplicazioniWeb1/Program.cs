@@ -98,13 +98,14 @@ apiEndpoints.MapGet("/logout", LogoutEndpoint.Handler).WithOpenApi(o => new(o)
 apiEndpoints.MapGet("/user", UserEndpoint.Handler).WithOpenApi(o => new(o)
 {
     Tags = new List<OpenApiTag> { new() { Name = "User" } },
-    Summary = "Get user"
+    Summary = "Get current logged user",
 });
 
 apiEndpoints.MapPut("/user", UserEndpoint.PutHandler).WithOpenApi(o => new(o)
 {
     Tags = new List<OpenApiTag> { new() { Name = "User" } },
-    Summary = "Edit user"
+    Summary = "Edit user",
+    Description = "Change user balance, premium status and battery"
 });
 
 apiEndpoints.MapGet("/role", RoleEndpoint.Handler).WithOpenApi( o => new(o)
@@ -119,15 +120,62 @@ apiEndpoints.MapPost("/role", RoleEndpoint.PostHandler).WithOpenApi(o => new (o)
     Summary = "Set role of user",
 }); 
 
-apiEndpoints.MapGet("/car-park", CarParkEndpoint.GetHandler).WithTags(new[] { "Carpark" });
-apiEndpoints.MapPut("/car-park/{id}", CarParkEndpoint.PutPark).WithTags(new[] { "Carpark" });
-apiEndpoints.MapPost("/car-park", CarParkEndpoint.PostHandler).WithTags(new[] { "Carpark" });
-apiEndpoints.MapGet("/car-park/{id}/car-spots", CarParkEndpoint.GetCarSpotHandler).WithTags(new[] { "Carpark" });
-apiEndpoints.MapDelete("/car-park/{id}", CarParkEndpoint.DeleteHandler).WithTags(new[] { "Carpark" });
-apiEndpoints.MapGet("/car-park/updates", CarParkEndpoint.ParkUpdateSse).WithTags(new[] { "Carpark" });
-apiEndpoints.MapGet("/car-park/{id}/queue", CarParkEndpoint.GetParkQueue).WithTags(new[] { "Carpark" });
-apiEndpoints.MapPost("/car-park/{id}/park", CarParkEndpoint.PostPark).WithTags(new[] { "Carpark" });
-apiEndpoints.MapGet("/car-park/current", CarParkEndpoint.GetCurrentPark).WithTags(new[] { "Carpark" });
+apiEndpoints.MapGet("/car-park", CarParkEndpoint.GetHandler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
+    Summary = "Get carparks",
+});
+
+apiEndpoints.MapPut("/car-park/{id}", CarParkEndpoint.PutPark).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
+    Summary = "Edit a carpark",
+});
+
+apiEndpoints.MapPost("/car-park", CarParkEndpoint.PostHandler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
+    Summary = "Create a new carpark",
+});
+
+apiEndpoints.MapGet("/car-park/{id}/car-spots", CarParkEndpoint.GetCarSpotHandler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
+    Summary = "Get carspots of carpark",
+});
+
+apiEndpoints.MapDelete("/car-park/{id}", CarParkEndpoint.DeleteHandler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
+    Summary = "Delete a carpark",
+});
+
+apiEndpoints.MapGet("/car-park/updates", CarParkEndpoint.ParkUpdateSse).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
+    Summary = "Get carpark notifications",
+    Description = "Retrieve the user's position in the queue. The returned value will be either a non-negative integer or -1."+
+        "A value of 0 or greater indicates the user's position in the queue." +
+        "A value of -1 indicates that the user must now park.",
+});
+
+apiEndpoints.MapGet("/car-park/{id}/queue", CarParkEndpoint.GetParkQueue).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
+    Summary = "Get waiting queue for carpark",
+});
+
+apiEndpoints.MapPost("/car-park/{id}/park", CarParkEndpoint.PostPark).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
+    Summary = "Park user's car",
+});
+
+apiEndpoints.MapGet("/car-park/current", CarParkEndpoint.GetCurrentPark).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
+    Summary = "Get current carpark occupied by user",
+});
 
 apiEndpoints.MapGet("/payments", InvoicesEndpoint.GetHandler).WithOpenApi(o => new(o)
 {
