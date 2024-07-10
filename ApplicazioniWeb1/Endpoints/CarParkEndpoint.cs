@@ -281,7 +281,13 @@ namespace ApplicazioniWeb1.Endpoints
             var books = (from book in db.Books
                          where book.CarParkId == id && !book.Entered
                          select book).Count();
-                       
+
+            var carSpots = (from spot in db.CarSpots
+                           where spot.CarParkId == id && spot.EndLease < DateTime.UtcNow
+                           select spot).Count();
+
+            if (carSpots == 0)
+                books += 1;
 
             return Results.Ok(new { Queue = books });
         }

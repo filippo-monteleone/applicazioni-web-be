@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 
@@ -16,6 +17,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicazioniWeb1.Data.Database>(c=> 
     c.UseNpgsql(connectionString: builder.Configuration.GetConnectionString("WebApiDatabase"))
 );
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddHostedService<QueueWorker>();
 
@@ -61,31 +65,80 @@ builder.Services.AddAuthorization();
 var app = builder.BuildWithSpa();
 var apiEndpoints = app.MapGroup("/api");
 
-apiEndpoints.MapGet("/external-login", ExternalLoginEndpoint.Handler);
-apiEndpoints.MapGet("/confirm-login", ConfirmLoginEndpoint.Handler);
+apiEndpoints.MapGet("/external-login", ExternalLoginEndpoint.Handler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Authentication" } },
+    Summary = "Login with external provider"
+});
 
-apiEndpoints.MapPost("/login", LoginEndpoint.Handler);
-apiEndpoints.MapPost("/register", RegisterEndpoint.Handler);
-apiEndpoints.MapGet("/logout", LogoutEndpoint.Handler);
+apiEndpoints.MapGet("/confirm-login", ConfirmLoginEndpoint.Handler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Authentication" } },
+    Summary = "Login with external provider"
+});
 
-apiEndpoints.MapGet("/user", UserEndpoint.Handler);
-apiEndpoints.MapPut("/user", UserEndpoint.PutHandler);
+apiEndpoints.MapPost("/login", LoginEndpoint.Handler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Authentication" } },
+    Summary = "Login with mail and password"
+});
 
-apiEndpoints.MapGet("/role", RoleEndpoint.Handler);
-apiEndpoints.MapPost("/role", RoleEndpoint.PostHandler);
+apiEndpoints.MapPost("/register", RegisterEndpoint.Handler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Authentication" } },
+    Summary = "Register a new user with mail and password"
+});
 
-apiEndpoints.MapGet("/car-park", CarParkEndpoint.GetHandler);
-apiEndpoints.MapPut("/car-park/{id}", CarParkEndpoint.PutPark);
-apiEndpoints.MapPost("/car-park", CarParkEndpoint.PostHandler);
-apiEndpoints.MapGet("/car-park/{id}/car-spots", CarParkEndpoint.GetCarSpotHandler);
-apiEndpoints.MapDelete("/car-park/{id}", CarParkEndpoint.DeleteHandler);
-apiEndpoints.MapGet("/car-park/updates", CarParkEndpoint.ParkUpdateSse);
-apiEndpoints.MapGet("/car-park/{id}/queue", CarParkEndpoint.GetParkQueue);
+apiEndpoints.MapGet("/logout", LogoutEndpoint.Handler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Authentication" } },
+    Summary = "Logout the user from the current session"
+});
 
-apiEndpoints.MapPost("/car-park/{id}/park", CarParkEndpoint.PostPark);
-apiEndpoints.MapGet("/car-park/current", CarParkEndpoint.GetCurrentPark);
+apiEndpoints.MapGet("/user", UserEndpoint.Handler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "User" } },
+    Summary = "Get user"
+});
 
-apiEndpoints.MapGet("/payments", InvoicesEndpoint.GetHandler);
-apiEndpoints.MapPost("/payments/settle", InvoicesEndpoint.PostCloseHandler);
+apiEndpoints.MapPut("/user", UserEndpoint.PutHandler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "User" } },
+    Summary = "Edit user"
+});
+
+apiEndpoints.MapGet("/role", RoleEndpoint.Handler).WithOpenApi( o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "User" } },
+    Summary = "Get role of user"
+}).WithTags(new[] { "User" }).WithSummary("Get role of user");
+
+apiEndpoints.MapPost("/role", RoleEndpoint.PostHandler).WithOpenApi(o => new (o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "User" } },
+    Summary = "Set role of user",
+}); 
+
+apiEndpoints.MapGet("/car-park", CarParkEndpoint.GetHandler).WithTags(new[] { "Carpark" });
+apiEndpoints.MapPut("/car-park/{id}", CarParkEndpoint.PutPark).WithTags(new[] { "Carpark" });
+apiEndpoints.MapPost("/car-park", CarParkEndpoint.PostHandler).WithTags(new[] { "Carpark" });
+apiEndpoints.MapGet("/car-park/{id}/car-spots", CarParkEndpoint.GetCarSpotHandler).WithTags(new[] { "Carpark" });
+apiEndpoints.MapDelete("/car-park/{id}", CarParkEndpoint.DeleteHandler).WithTags(new[] { "Carpark" });
+apiEndpoints.MapGet("/car-park/updates", CarParkEndpoint.ParkUpdateSse).WithTags(new[] { "Carpark" });
+apiEndpoints.MapGet("/car-park/{id}/queue", CarParkEndpoint.GetParkQueue).WithTags(new[] { "Carpark" });
+apiEndpoints.MapPost("/car-park/{id}/park", CarParkEndpoint.PostPark).WithTags(new[] { "Carpark" });
+apiEndpoints.MapGet("/car-park/current", CarParkEndpoint.GetCurrentPark).WithTags(new[] { "Carpark" });
+
+apiEndpoints.MapGet("/payments", InvoicesEndpoint.GetHandler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Invoice" } },
+    Summary = "Get payments",
+});
+
+apiEndpoints.MapPost("/payments/settle", InvoicesEndpoint.PostCloseHandler).WithOpenApi(o => new(o)
+{
+    Tags = new List<OpenApiTag> { new() { Name = "Invoice" } },
+    Summary = "Settle a payment",
+});
 
 app.Run();
