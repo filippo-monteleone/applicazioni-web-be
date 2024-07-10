@@ -273,33 +273,17 @@ namespace ApplicazioniWeb1.Endpoints
 
                 await Task.Delay(1000);
             }
+        }
 
-            //while (true)
-            //{
-            //    var user = await userManager.GetUserAsync(ctx.User);
+        public static async Task<IResult> GetParkQueue(int id, Database db)
+        {
+            var carPark = db.CarParks.Where(c => c.Id == id);
+            var books = (from book in db.Books
+                         where book.CarParkId == id && !book.Entered
+                         select book).Count();
+                       
 
-            //    var myReservation = db.Books.FirstOrDefault(b => b.UserId == user.Id && !b.Entered);
-
-            //    if (myReservation != null)
-            //    {
-            //        var list = from book in db.Books
-            //                   where myReservation.CarParkId == book.CarParkId && book.Entered == false
-            //                   orderby book.Date 
-            //                   select book;
-
-            //        await ctx.Response.WriteAsync($"data: {list.ToList().FindIndex(b => b.UserId == user.Id)}\n\n");
-
-            //        await ctx.Response.Body.FlushAsync();
-            //        await Task.Delay(1000);
-            //    } else
-            //    {
-            //        await ctx.Response.WriteAsync($"data: {-1}\n\n");
-
-            //        await ctx.Response.Body.FlushAsync();
-            //        await Task.Delay(1000);
-            //    }
-
-            //}
+            return Results.Ok(new { Queue = books });
         }
 
         public static async Task<IResult> GetCurrentPark(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)

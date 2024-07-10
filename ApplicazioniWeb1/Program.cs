@@ -80,6 +80,7 @@ apiEndpoints.MapPost("/car-park", CarParkEndpoint.PostHandler);
 apiEndpoints.MapGet("/car-park/{id}/car-spots", CarParkEndpoint.GetCarSpotHandler);
 apiEndpoints.MapDelete("/car-park/{id}", CarParkEndpoint.DeleteHandler);
 apiEndpoints.MapGet("/car-park/updates", CarParkEndpoint.ParkUpdateSse);
+apiEndpoints.MapGet("/car-park/{id}/queue", CarParkEndpoint.GetParkQueue);
 
 apiEndpoints.MapPost("/car-park/{id}/park", CarParkEndpoint.PostPark);
 apiEndpoints.MapGet("/car-park/current", CarParkEndpoint.GetCurrentPark);
