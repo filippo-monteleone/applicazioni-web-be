@@ -1,6 +1,7 @@
 ﻿
 
 using ApplicazioniWeb1.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using static ApplicazioniWeb1.Endpoints.CarParkEndpoint;
 
@@ -24,6 +25,7 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                 await using var scope = _serviceScopeFactory.CreateAsyncScope();
                 var db = scope.ServiceProvider.GetRequiredService<Database>();
 
+
                 var invoices = (from invoice in db.Invoices
                                 where invoice.Paid == null && invoice.DateEnd <= DateTime.UtcNow
                                 select invoice).ToList();
@@ -33,6 +35,10 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                     if (invoice != null)
                     {
                         invoice.Paid = invoice.Value;
+
+                        var user = (from u in db.Users where u.Id == invoice.UserId select u).Single();
+
+                        user.Balance = (user.Balance - invoice.Paid).Value;
                     }
 
                     db.SaveChanges();

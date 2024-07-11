@@ -106,6 +106,8 @@ namespace ApplicazioniWeb1.Endpoints
             {
                 var percentage =  (DateTime.UtcNow - i.DateStart).TotalSeconds / ((i.DateEnd - i.DateStart).TotalSeconds / 100) / 100;
                 i.Paid = (float?)((float)i.Value * percentage);
+
+                user.Balance = (user.Balance - i.Paid).Value;
             }
 
             db.SaveChanges();
