@@ -1,6 +1,9 @@
 ﻿using ApplicazioniWeb1.Data;
 using Azure.Security.KeyVault.Certificates;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ApplicazioniWeb1.Endpoints
 {
@@ -11,18 +14,25 @@ namespace ApplicazioniWeb1.Endpoints
             public string Invite { get; set; }
         }
 
-        public static async Task<IResult> Handler(UserManager<ApplicationUser> userManager, HttpContext ctx)
+        [Authorize]
+        public static async Task<Results<Ok<IList<string>>, NotFound>> Handler(UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
+
+            if (user is null)
+                return TypedResults.NotFound();
 
             var roles = await userManager.GetRolesAsync(user);
-
-            return roles.Count() == 0 ? Results.NotFound() : Results.Ok(roles);
+            return roles.Count == 0 ? TypedResults.NotFound() : TypedResults.Ok(roles);
         }
 
-        public static async Task<IResult> PostHandler(InviteForm invite, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, HttpContext ctx)
+        [Authorize]
+        public static async Task<Results<Ok, NotFound>> PostHandler(InviteForm invite, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
+
+            if (user is null)
+                return TypedResults.NotFound();
 
             if (invite.Invite == "admin")
             {
@@ -36,7 +46,7 @@ namespace ApplicazioniWeb1.Endpoints
 
             await signInManager.RefreshSignInAsync(user);
 
-            return Results.Ok();
+            return TypedResults.Ok();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ApplicazioniWeb1.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,16 +13,16 @@ namespace ApplicazioniWeb1.Endpoints
             public string Password { get; set; }
         }
 
-        public static async Task<IResult> Handler([FromBody] LoginForm login, SignInManager<ApplicationUser> signInManager)
+        public static async Task<Results<Ok, BadRequest>> Handler([FromBody] LoginForm login, SignInManager<ApplicationUser> signInManager)
         {
             var result = await signInManager.PasswordSignInAsync(login.Username, login.Password, true, false);
 
             if (result.Succeeded)
             {
-                return Results.Ok();
+                return TypedResults.Ok();
             }
 
-            return Results.BadRequest();
+            return TypedResults.BadRequest();
         }
     }
 }

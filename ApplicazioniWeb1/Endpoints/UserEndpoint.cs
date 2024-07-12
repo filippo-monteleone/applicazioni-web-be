@@ -1,5 +1,6 @@
 ﻿using ApplicazioniWeb1.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
@@ -15,23 +16,26 @@ namespace ApplicazioniWeb1.Endpoints
         }
 
         [Authorize]
-        public static async Task<IResult> Handler(HttpContext ctx, UserManager<ApplicationUser> userManager)
+        public static async Task<Results<Ok<UserDto>, NotFound>> Handler(HttpContext ctx, UserManager<ApplicationUser> userManager)
         {
-            var user = ctx.User;
-
-            var dbUser = await userManager.GetUserAsync(user);
-
-            return Results.Ok(new { 
-                Name = dbUser.UserName, 
-                Balance = dbUser.Balance, 
-                Battery = dbUser.Battery, 
-                Pro = dbUser.Pro 
-            }) ;
+            return await userManager.GetUserAsync(ctx.User)
+                is ApplicationUser dbUser ? TypedResults.Ok(new UserDto
+                {
+                    Name = dbUser.UserName,
+                    Balance = dbUser.Balance,
+                    Battery = dbUser.Battery,
+                    Pro = dbUser.Pro
+                }) : TypedResults.NotFound();
         }
 
-        public static async Task<IResult> PutHandler(UserForm user, HttpContext ctx, UserManager<ApplicationUser> userManager)
+        [Authorize]
+        public static async Task<Results<Ok, NotFound>> PutHandler(UserForm user, HttpContext ctx, UserManager<ApplicationUser> userManager)
         {
             var dbUser = await userManager.GetUserAsync(ctx.User);
+
+            if (dbUser is null)
+                TypedResults.NotFound();
+
 
             dbUser.Balance = user.Balance ?? dbUser.Balance;
             dbUser.Pro = user.Pro ?? dbUser.Pro;
@@ -39,7 +43,7 @@ namespace ApplicazioniWeb1.Endpoints
 
             var result = await userManager.UpdateAsync(dbUser);
 
-            return Results.Ok(result);
+            return TypedResults.Ok();
         }
     }
 }

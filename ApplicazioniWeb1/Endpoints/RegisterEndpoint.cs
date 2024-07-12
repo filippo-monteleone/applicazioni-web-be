@@ -1,4 +1,5 @@
 ﻿using ApplicazioniWeb1.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,7 @@ namespace ApplicazioniWeb1.Endpoints
             public string Password { get; set; }
         }
 
-        public static async Task<IResult> Handler(RegisterForm form, string? invite, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
+        public static async Task<Results<Created, BadRequest>> Handler(RegisterForm form, string? invite, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
             var user = new ApplicationUser() { UserName = form.Username };
             var createUserResult = await userManager.CreateAsync(user, form.Password);
@@ -28,11 +29,11 @@ namespace ApplicazioniWeb1.Endpoints
             }
 
             if (!createUserResult.Succeeded)
-                return Results.BadRequest();
+                return TypedResults.BadRequest();
 
             await signInManager.SignInAsync(user, true);
 
-            return Results.Ok();
+            return TypedResults.Created();
         }
     }
 }

@@ -1,14 +1,15 @@
 ﻿using ApplicazioniWeb1.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
 namespace ApplicazioniWeb1.Endpoints
 {
     public class LogoutEndpoint
     {
-        public static async Task<IResult> Handler(SignInManager<ApplicationUser> signInManger)
+        public static async Task<Ok> Handler(SignInManager<ApplicationUser> signInManger)
         {
             await signInManger.SignOutAsync();
-            return Results.Ok();
+            return TypedResults.Ok();
         }
     }
 }

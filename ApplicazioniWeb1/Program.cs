@@ -68,7 +68,7 @@ var apiEndpoints = app.MapGroup("/api");
 apiEndpoints.MapGet("/external-login", ExternalLoginEndpoint.Handler).WithOpenApi(o => new(o)
 {
     Tags = new List<OpenApiTag> { new() { Name = "Authentication" } },
-    Summary = "Login with external provider"
+    Summary = "Login with external provider",
 });
 
 apiEndpoints.MapGet("/confirm-login", ConfirmLoginEndpoint.Handler).WithOpenApi(o => new(o)
@@ -108,11 +108,11 @@ apiEndpoints.MapPut("/user", UserEndpoint.PutHandler).WithOpenApi(o => new(o)
     Description = "Change user balance, premium status and battery"
 });
 
-apiEndpoints.MapGet("/role", RoleEndpoint.Handler).WithOpenApi( o => new(o)
+apiEndpoints.MapGet("/role", RoleEndpoint.Handler).WithOpenApi(o => new(o)
 {
     Tags = new List<OpenApiTag> { new() { Name = "User" } },
     Summary = "Get role of user"
-}).WithTags(new[] { "User" }).WithSummary("Get role of user");
+});
 
 apiEndpoints.MapPost("/role", RoleEndpoint.PostHandler).WithOpenApi(o => new (o)
 {

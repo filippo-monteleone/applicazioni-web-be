@@ -1,4 +1,5 @@
 ﻿using ApplicazioniWeb1.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,7 @@ namespace ApplicazioniWeb1.Endpoints
             public bool Premium { get; set; }
         }
 
-        public static async Task<IResult> GetHandler(
+        public static async Task<Ok<PaginatedInvoice>> GetHandler(
             DateTime? StartDate, DateTime? EndDate,
             int page, int resultsPerPage, 
             Database db, UserManager<ApplicationUser> userManager, HttpContext ctx,
@@ -38,7 +39,6 @@ namespace ApplicazioniWeb1.Endpoints
             var carParks = db.CarParks.Where(c => c.OwnerId == user.Id).Select(c => c.Id.ToString());
 
             var invoices = db.Invoices.Include(i => i.User).Where(i => carParks.Any(c => c == i.CarParkId)).ToArray();
-
 
             List<string> parking = new();
             if (Parking)
@@ -75,7 +75,7 @@ namespace ApplicazioniWeb1.Endpoints
                 .Skip((page - 1) * (int)resultsPerPage)
                 .Take((int)resultsPerPage);
 
-            return Results.Ok(new {
+            return TypedResults.Ok(new PaginatedInvoice {
                 invoices = paginatedInvoices,
                 currentPage = page,
                 pages = (int)page,
@@ -84,7 +84,7 @@ namespace ApplicazioniWeb1.Endpoints
 
         }
 
-        public  static async Task<IResult> PostCloseHandler(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        public  static async Task<Results<NoContent, NotFound>> PostCloseHandler(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
 
@@ -92,7 +92,7 @@ namespace ApplicazioniWeb1.Endpoints
 
             if (carSpot == null)
             {
-                return Results.NotFound();
+                return TypedResults.NotFound();
             }
 
             carSpot.UserId = null;
@@ -112,7 +112,7 @@ namespace ApplicazioniWeb1.Endpoints
 
             db.SaveChanges();
 
-            return Results.Ok();
+            return TypedResults.NoContent();
         }
     }
 }
