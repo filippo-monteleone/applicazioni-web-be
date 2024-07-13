@@ -1,5 +1,6 @@
 ﻿using ApplicazioniWeb1.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -55,7 +56,7 @@ namespace ApplicazioniWeb1.Endpoints
 
 
         [Authorize(Roles = "admin")]
-        public static async Task<IResult> PostHandler(CarPark carPark, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        public static async Task<Results<Created, BadRequest>> PostHandler(CarPark carPark, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
 
@@ -69,33 +70,43 @@ namespace ApplicazioniWeb1.Endpoints
                 Power = carPark.Power
             });
 
-            db.SaveChanges();
-
-            if (carPark.CarSpots <= 0)
-            {
-                return Results.BadRequest();
-            }
+            await db.SaveChangesAsync();
 
             for (int i = 0; i < carPark.CarSpots; i++)
                 db.CarSpots.Add(new CarSpot { CarParkId = c.Entity.Id });
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
 
-            return Results.Ok();
+            return TypedResults.Created();
         }
 
-        public static async Task<IResult> GetHandler(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx, [FromQuery] bool me = false) {
+
+        [Authorize]
+        public static async Task<Ok<List<CarParkDto>>> GetHandler(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx, [FromQuery] bool me = false) {
             var user = await userManager.GetUserAsync(ctx.User);
 
             var carParks = db.CarParks.Where(carPark => me ? carPark.OwnerId == user.Id : true);
 
-            return Results.Ok(carParks);
+            var carParksDto = new List<CarParkDto>();
+            
+            foreach (var item in carParks)
+            {
+                carParksDto.Add(new CarParkDto {
+                    Id = item.Id,
+                    OwnerId = item.OwnerId,
+                    Name = item.Name,
+                    ParkRate = item.ParkRate,
+                    ChargeRate = item.ChargeRate,
+                    Lat = item.Lat,
+                    Long = item.Long,
+                    Power = item.Power,
+                });
+            }
 
+            return TypedResults.Ok(carParksDto);
         }
 
-
-        [Authorize(Roles = "admin")]
         public static async Task<IResult> DeleteHandler(Database db, int id, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
 

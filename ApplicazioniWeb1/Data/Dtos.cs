@@ -8,6 +8,18 @@
         public int Battery { get; set; }
     }
 
+    public struct CarParkDto
+    {
+        public int Id { get; set; }
+        public string OwnerId { get; set; }
+        public string Name { get; set; }
+        public float ParkRate { get; set; }
+        public float ChargeRate { get; set; }
+        public string Lat { get; set; }
+        public string Long { get; set; }
+        public int Power { get; set; }
+    }
+
     public struct PaginatedInvoice
     {
         public IEnumerable<Invoice> invoices { get; set; }

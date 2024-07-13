@@ -2,9 +2,11 @@ using ApplicazioniWeb;
 using ApplicazioniWeb1.BackgroundWorkers;
 using ApplicazioniWeb1.Data;
 using ApplicazioniWeb1.Endpoints;
+using ApplicazioniWeb1.Filters;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +16,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<ApplicazioniWeb1.Data.Database>(c=> 
+builder.Services.AddDbContext<ApplicazioniWeb1.Data.Database>(c =>
     c.UseNpgsql(connectionString: builder.Configuration.GetConnectionString("WebApiDatabase"))
 );
 
@@ -25,7 +27,7 @@ builder.Services.AddHostedService<QueueWorker>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    if(builder.Environment.IsDevelopment())
+    if (builder.Environment.IsDevelopment())
     {
         options.User.RequireUniqueEmail = false;
         options.Password.RequireDigit = false;
@@ -114,11 +116,11 @@ apiEndpoints.MapGet("/role", RoleEndpoint.Handler).WithOpenApi(o => new(o)
     Summary = "Get role of user"
 });
 
-apiEndpoints.MapPost("/role", RoleEndpoint.PostHandler).WithOpenApi(o => new (o)
+apiEndpoints.MapPost("/role", RoleEndpoint.PostHandler).WithOpenApi(o => new(o)
 {
     Tags = new List<OpenApiTag> { new() { Name = "User" } },
     Summary = "Set role of user",
-}); 
+});
 
 apiEndpoints.MapGet("/car-park", CarParkEndpoint.GetHandler).WithOpenApi(o => new(o)
 {
@@ -130,13 +132,13 @@ apiEndpoints.MapPut("/car-park/{id}", CarParkEndpoint.PutPark).WithOpenApi(o => 
 {
     Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
     Summary = "Edit a carpark",
-});
+}).AddEndpointFilter(new EditCarParkFilter());
 
 apiEndpoints.MapPost("/car-park", CarParkEndpoint.PostHandler).WithOpenApi(o => new(o)
 {
     Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
     Summary = "Create a new carpark",
-});
+}).AddEndpointFilter(new CreateCarParkFilter());
 
 apiEndpoints.MapGet("/car-park/{id}/car-spots", CarParkEndpoint.GetCarSpotHandler).WithOpenApi(o => new(o)
 {
@@ -154,7 +156,7 @@ apiEndpoints.MapGet("/car-park/updates", CarParkEndpoint.ParkUpdateSse).WithOpen
 {
     Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
     Summary = "Get carpark notifications",
-    Description = "Retrieve the user's position in the queue. The returned value will be either a non-negative integer or -1."+
+    Description = "Retrieve the user's position in the queue. The returned value will be either a non-negative integer or -1." +
         "A value of 0 or greater indicates the user's position in the queue." +
         "A value of -1 indicates that the user must now park.",
 });

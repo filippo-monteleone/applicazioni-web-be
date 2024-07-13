@@ -1,4 +1,5 @@
 ﻿using ApplicazioniWeb1.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,7 @@ namespace ApplicazioniWeb1.Endpoints
             public bool Premium { get; set; }
         }
 
+        [Authorize(Roles = "admin")]
         public static async Task<Ok<PaginatedInvoice>> GetHandler(
             DateTime? StartDate, DateTime? EndDate,
             int page, int resultsPerPage, 
@@ -84,6 +86,7 @@ namespace ApplicazioniWeb1.Endpoints
 
         }
 
+        [Authorize]
         public  static async Task<Results<NoContent, NotFound>> PostCloseHandler(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
