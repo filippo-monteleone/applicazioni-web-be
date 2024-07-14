@@ -27,4 +27,12 @@
         public int pages { get; set; }
         public int length { get; set; }
     }
+
+    public struct PaginatedCarSpots
+    {
+        public IEnumerable<CarSpot> carSpots { get; set; }
+        public int currentPage { get; set; }
+        public int pages { get; set; }
+        public int length { get; set; }
+    }
 }

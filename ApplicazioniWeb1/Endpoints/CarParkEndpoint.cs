@@ -126,14 +126,14 @@ namespace ApplicazioniWeb1.Endpoints
         }
 
         [Authorize(Roles = "admin")]
-        public static async Task<IResult> GetCarSpotHandler(int id, [FromQuery] int page, [FromQuery] int resultsPerPage, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        public static async Task<Results<Ok<PaginatedCarSpots>, NotFound>> GetCarSpotHandler(int id, [FromQuery] int page, [FromQuery] int resultsPerPage, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
 
             var carPark = db.CarParks.Where(carPark => carPark.Id == id && carPark.OwnerId == user.Id).SingleOrDefault();
 
-            if (carPark == null || page <= 0)
-                return Results.NotFound();
+            if (carPark == null)
+                return TypedResults.NotFound();
 
             var carSpots = (db.CarSpots.Where(carSpot => carSpot.CarParkId == carPark.Id)).ToList();
 
@@ -148,7 +148,7 @@ namespace ApplicazioniWeb1.Endpoints
                 if (spot.EndLease < DateTime.UtcNow) spot.UserId = null;
             }
 
-            return Results.Ok(new {
+            return TypedResults.Ok(new PaginatedCarSpots {
                 carSpots = paginatedCarSpots,
                 currentPage = page,
                 pages = (int)page,
