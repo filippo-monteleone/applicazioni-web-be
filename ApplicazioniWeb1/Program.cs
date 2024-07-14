@@ -120,7 +120,7 @@ apiEndpoints.MapPost("/role", RoleEndpoint.PostHandler).WithOpenApi(o => new(o)
 {
     Tags = new List<OpenApiTag> { new() { Name = "User" } },
     Summary = "Set role of user",
-});
+}).AddEndpointFilter<SelectRoleFilter>();
 
 apiEndpoints.MapGet("/car-park", CarParkEndpoint.GetHandler).WithOpenApi(o => new(o)
 {
@@ -128,17 +128,17 @@ apiEndpoints.MapGet("/car-park", CarParkEndpoint.GetHandler).WithOpenApi(o => ne
     Summary = "Get carparks",
 });
 
-apiEndpoints.MapPut("/car-park/{id}", CarParkEndpoint.PutPark).WithOpenApi(o => new(o)
+apiEndpoints.MapPut("/car-park/{id:int}", CarParkEndpoint.PutPark).WithOpenApi(o => new(o)
 {
     Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
     Summary = "Edit a carpark",
-}).AddEndpointFilter(new EditCarParkFilter());
+}).AddEndpointFilter<EditCarParkFilter>();
 
 apiEndpoints.MapPost("/car-park", CarParkEndpoint.PostHandler).WithOpenApi(o => new(o)
 {
     Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
     Summary = "Create a new carpark",
-}).AddEndpointFilter(new CreateCarParkFilter());
+}).AddEndpointFilter<CreateCarParkFilter>();
 
 apiEndpoints.MapGet("/car-park/{id}/car-spots", CarParkEndpoint.GetCarSpotHandler).WithOpenApi(o => new(o)
 {

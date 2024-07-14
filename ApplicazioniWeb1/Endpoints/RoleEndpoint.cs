@@ -31,18 +31,8 @@ namespace ApplicazioniWeb1.Endpoints
         {
             var user = await userManager.GetUserAsync(ctx.User);
 
-            if (user is null)
-                return TypedResults.NotFound();
-
-            if (invite.Invite == "admin")
-            {
-                await roleManager.CreateAsync(new IdentityRole() { Name = "admin" });
-                await userManager.AddToRoleAsync(user, "admin");
-            } else
-            {
-                await roleManager.CreateAsync(new IdentityRole() { Name = "user" });
-                await userManager.AddToRoleAsync(user, "user");
-            }
+            await roleManager.CreateAsync(new IdentityRole() { Name = invite.Invite });
+            await userManager.AddToRoleAsync(user, invite.Invite);
 
             await signInManager.RefreshSignInAsync(user);
 

@@ -40,7 +40,7 @@ namespace ApplicazioniWeb1.Endpoints
         }
 
         [Authorize(Roles = "admin")]
-        public static async Task<IResult> PutPark(int id, UpdatePark parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        public static async Task<Results<NoContent, BadRequest>> PutPark(int id, UpdatePark parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
 
@@ -51,7 +51,7 @@ namespace ApplicazioniWeb1.Endpoints
 
             db.SaveChanges();
 
-            return Results.Ok();
+            return TypedResults.NoContent();
         }
 
 
