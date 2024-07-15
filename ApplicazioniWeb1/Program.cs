@@ -14,11 +14,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicazioniWeb1.Data.Database>(c =>
     c.UseNpgsql(connectionString: builder.Configuration.GetConnectionString("WebApiDatabase"))
 );
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -171,7 +181,7 @@ apiEndpoints.MapPost("/car-park/{id}/park", CarParkEndpoint.PostPark).WithOpenAp
 {
     Tags = new List<OpenApiTag> { new() { Name = "Carpark" } },
     Summary = "Park user's car",
-});
+}).AddEndpointFilter<ParkCarFilter>();
 
 apiEndpoints.MapGet("/car-park/current", CarParkEndpoint.GetCurrentPark).WithOpenApi(o => new(o)
 {

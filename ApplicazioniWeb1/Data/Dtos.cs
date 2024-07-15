@@ -1,4 +1,8 @@
-﻿namespace ApplicazioniWeb1.Data
+﻿using Newtonsoft.Json.Converters;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+
+namespace ApplicazioniWeb1.Data
 {
     public struct UserDto
     {
@@ -18,6 +22,17 @@
         public string Lat { get; set; }
         public string Long { get; set; }
         public int Power { get; set; }
+    }
+
+    public struct ParkInfo
+    {
+        public enum Info
+        {
+            Free,
+            Full
+        }
+        public Info Status { get; set; }
+        public DateTime? EndParking { get; set; }
     }
 
     public struct PaginatedInvoice

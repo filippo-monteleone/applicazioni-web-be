@@ -156,16 +156,15 @@ namespace ApplicazioniWeb1.Endpoints
             });
         }
 
-        public static async Task<IResult> PostPark(int id, ParkForm parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        [Authorize]
+        public static async Task<Results<Ok<ParkInfo>, BadRequest>> PostPark(int id, ParkForm parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
-            var carPark = db.CarParks.Include(c => c.carSpots).SingleOrDefault(carPark => carPark.Id == id);
-
-            if (carPark == null)
-                return Results.Problem();
+            var carPark = db.CarParks.Include(c => c.carSpots).FirstOrDefault(carPark => carPark.Id == id);
 
             var user = await userManager.GetUserAsync(ctx.User);
+
             if (user.Battery == 0)
-                return Results.Problem();
+                return TypedResults.BadRequest();
 
 
             var freeSpot = carPark.carSpots.FirstOrDefault(s => s.EndLease < DateTime.UtcNow);
@@ -184,9 +183,9 @@ namespace ApplicazioniWeb1.Endpoints
                     CurrentCharge = parkForm.CurrentCharge,
                 });
                 db.SaveChanges();
-                return Results.Ok(new
+                return TypedResults.Ok(new ParkInfo
                 {
-                    Status = "Full"
+                    Status = ParkInfo.Info.Free,
                 });
             }
 
@@ -227,11 +226,10 @@ namespace ApplicazioniWeb1.Endpoints
 
             db.SaveChanges();
 
-            return Results.Ok(new
-            {
-                Status = "Free",
-                EndParking = freeSpot.EndLease
-            }) ;
+            return TypedResults.Ok(new ParkInfo {
+                Status = ParkInfo.Info.Free,
+                EndParking = freeSpot.EndLease,
+            });
         }
 
         public static async Task ParkUpdateSse(HttpContext ctx, Database db, UserManager<ApplicationUser> userManager, CancellationToken token)
