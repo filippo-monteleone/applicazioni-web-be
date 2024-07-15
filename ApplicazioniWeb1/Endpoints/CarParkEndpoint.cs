@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Timers;
+using static ApplicazioniWeb1.Data.QueueInfo;
 
 namespace ApplicazioniWeb1.Endpoints
 {
@@ -107,7 +108,8 @@ namespace ApplicazioniWeb1.Endpoints
             return TypedResults.Ok(carParksDto);
         }
 
-        public static async Task<IResult> DeleteHandler(Database db, int id, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        [Authorize(Roles = "admin")]
+        public static async Task<Ok> DeleteHandler(int id, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
 
             var user = await userManager.GetUserAsync(ctx.User);
@@ -119,10 +121,10 @@ namespace ApplicazioniWeb1.Endpoints
                 db.CarParks.Remove(carPark);
                 db.SaveChanges();
 
-                return Results.Ok();
+                return TypedResults.Ok();
             }
 
-            return Results.NotFound();
+            return TypedResults.Ok();
         }
 
         [Authorize(Roles = "admin")]
@@ -157,7 +159,7 @@ namespace ApplicazioniWeb1.Endpoints
         }
 
         [Authorize]
-        public static async Task<Results<Ok<ParkInfo>, BadRequest>> PostPark(int id, ParkForm parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        public static async Task<Results<Ok<ParkInfo>, BadRequest, NotFound>> PostPark(int id, ParkForm parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var carPark = db.CarParks.Include(c => c.carSpots).FirstOrDefault(carPark => carPark.Id == id);
 
@@ -284,9 +286,13 @@ namespace ApplicazioniWeb1.Endpoints
             }
         }
 
-        public static async Task<IResult> GetParkQueue(int id, Database db)
+        public static async Task<Results<Ok<QueueInfo>, NotFound>> GetParkQueue(int id, Database db)
         {
             var carPark = db.CarParks.Where(c => c.Id == id);
+
+            if (carPark is null)
+                return TypedResults.NotFound();
+
             var books = (from book in db.Books
                          where book.CarParkId == id && !book.Entered
                          select book).Count();
@@ -298,7 +304,7 @@ namespace ApplicazioniWeb1.Endpoints
             if (carSpots == 0)
                 books += 1;
 
-            return Results.Ok(new { Queue = books });
+            return TypedResults.Ok(new QueueInfo { Queue = books });
         }
 
         public static async Task<IResult> GetCurrentPark(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)

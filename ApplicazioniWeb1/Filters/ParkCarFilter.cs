@@ -19,7 +19,7 @@ namespace ApplicazioniWeb1.Filters
 
             if (!_db.CarParks.Any(c => c.Id == id))
             {
-                return TypedResults.Problem("Id not found", statusCode: 400);
+                return TypedResults.Problem("Id not found", statusCode: 404);
             }
 
             var park = context.GetArgument<ParkForm>(1);

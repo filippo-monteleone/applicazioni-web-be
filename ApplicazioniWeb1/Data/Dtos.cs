@@ -24,6 +24,11 @@ namespace ApplicazioniWeb1.Data
         public int Power { get; set; }
     }
 
+    public struct QueueInfo
+    {
+        public int Queue { get; set; }
+    }
+
     public struct ParkInfo
     {
         public enum Info
