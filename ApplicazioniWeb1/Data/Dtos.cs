@@ -40,6 +40,42 @@ namespace ApplicazioniWeb1.Data
         public DateTime? EndParking { get; set; }
     }
 
+
+    //Id = carParkReserved.Id,
+    //                Name = carParkReserved.Name,
+    //                ParkRate = carParkReserved.ParkRate,
+    //                ChargeRate = carParkReserved.ChargeRate,
+    //                InQueue = true,
+    //                pos = list.ToList().FindIndex(b => b.UserId == user.Id)
+
+
+    //Id = carPark.Id,
+    //            Name = carPark.Name,
+    //            ParkRate = carPark.ParkRate,
+    //            ChargeRate = carPark.ChargeRate,
+    //            InQueue = false,
+    //            EndParking = carSpot.EndLease,
+    //            chargeCurrent = toPay + park,
+    //            stepCurrent = step,
+    //            stepPark = parkStep,
+    //            batteryStep,
+    //            battery
+    public struct CurrentPark
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public float ParkRate { get; set; }
+        public float ChargeRate { get; set; }
+        public bool InQueue { get; set; }
+        public int? Pos { get; set; }
+        public float? ChargeCurrent { get; set; }
+        public double StepCurrent { get; set; }
+        public double StepPark { get; set; }
+        public double BatteryStep { get; set; }
+        public float? Battery { get; set; }
+        public DateTime EndParking { get; set; }
+    }
+
     public struct PaginatedInvoice
     {
         public IEnumerable<Invoice> invoices { get; set; }

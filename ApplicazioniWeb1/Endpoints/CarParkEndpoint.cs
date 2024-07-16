@@ -187,7 +187,7 @@ namespace ApplicazioniWeb1.Endpoints
                 db.SaveChanges();
                 return TypedResults.Ok(new ParkInfo
                 {
-                    Status = ParkInfo.Info.Free,
+                    Status = ParkInfo.Info.Full,
                 });
             }
 
@@ -307,7 +307,7 @@ namespace ApplicazioniWeb1.Endpoints
             return TypedResults.Ok(new QueueInfo { Queue = books });
         }
 
-        public static async Task<IResult> GetCurrentPark(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        public static async Task<Results<Ok<CurrentPark>, NotFound>> GetCurrentPark(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
 
@@ -323,20 +323,20 @@ namespace ApplicazioniWeb1.Endpoints
 
                 var carParkReserved = db.CarParks.FirstOrDefault(c => c.Id == myReservation.CarParkId);
 
-                return Results.Ok(new { 
+                return TypedResults.Ok(new CurrentPark { 
                     Id = carParkReserved.Id,
                     Name = carParkReserved.Name,
                     ParkRate = carParkReserved.ParkRate,
                     ChargeRate = carParkReserved.ChargeRate,
                     InQueue = true,
-                    pos = list.ToList().FindIndex(b => b.UserId == user.Id) 
+                    Pos = list.ToList().FindIndex(b => b.UserId == user.Id) 
                 });
             }
 
             if (carSpot == null)
             {
 
-                return Results.NotFound();
+                return TypedResults.NotFound();
             }
 
             var carPark = db.CarParks.FirstOrDefault(c => c.Id == carSpot.CarParkId);
@@ -368,7 +368,7 @@ namespace ApplicazioniWeb1.Endpoints
                 }
             }
 
-            return Results.Ok(new
+            return TypedResults.Ok(new CurrentPark
             {
                 Id = carPark.Id,
                 Name = carPark.Name,
@@ -376,11 +376,11 @@ namespace ApplicazioniWeb1.Endpoints
                 ChargeRate = carPark.ChargeRate,
                 InQueue = false,
                 EndParking = carSpot.EndLease,
-                chargeCurrent = toPay + park,
-                stepCurrent = step,
-                stepPark = parkStep,
-                batteryStep,
-                battery
+                ChargeCurrent = toPay + park,
+                StepCurrent = step,
+                StepPark = parkStep,
+                BatteryStep = batteryStep,
+                Battery = battery
             }) ;
         }
     }
