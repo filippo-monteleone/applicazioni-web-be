@@ -40,26 +40,6 @@ namespace ApplicazioniWeb1.Data
         public DateTime? EndParking { get; set; }
     }
 
-
-    //Id = carParkReserved.Id,
-    //                Name = carParkReserved.Name,
-    //                ParkRate = carParkReserved.ParkRate,
-    //                ChargeRate = carParkReserved.ChargeRate,
-    //                InQueue = true,
-    //                pos = list.ToList().FindIndex(b => b.UserId == user.Id)
-
-
-    //Id = carPark.Id,
-    //            Name = carPark.Name,
-    //            ParkRate = carPark.ParkRate,
-    //            ChargeRate = carPark.ChargeRate,
-    //            InQueue = false,
-    //            EndParking = carSpot.EndLease,
-    //            chargeCurrent = toPay + park,
-    //            stepCurrent = step,
-    //            stepPark = parkStep,
-    //            batteryStep,
-    //            battery
     public struct CurrentPark
     {
         public int Id { get; set; }

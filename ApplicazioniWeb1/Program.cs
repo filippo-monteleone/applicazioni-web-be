@@ -118,7 +118,7 @@ apiEndpoints.MapPut("/user", UserEndpoint.PutHandler).WithOpenApi(o => new(o)
     Tags = new List<OpenApiTag> { new() { Name = "User" } },
     Summary = "Edit user",
     Description = "Change user balance, premium status and battery"
-});
+}).AddEndpointFilter<EditUserFilter>();
 
 apiEndpoints.MapGet("/role", RoleEndpoint.Handler).WithOpenApi(o => new(o)
 {

@@ -6,14 +6,15 @@ using System.Security.Claims;
 
 namespace ApplicazioniWeb1.Endpoints
 {
+    public class UserForm
+    {
+        public float? Balance { get; set; }
+        public bool? Pro { get; set; }
+        public int? Battery { get; set; }
+    }
+
     public class UserEndpoint
     {
-        public class UserForm
-        {
-            public float? Balance { get; set; }
-            public bool? Pro { get; set; }
-            public int? Battery { get; set; }
-        }
 
         [Authorize]
         public static async Task<Results<Ok<UserDto>, NotFound>> Handler(HttpContext ctx, UserManager<ApplicationUser> userManager)
