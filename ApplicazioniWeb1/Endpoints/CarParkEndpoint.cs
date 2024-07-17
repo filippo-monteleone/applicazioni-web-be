@@ -159,14 +159,14 @@ namespace ApplicazioniWeb1.Endpoints
         }
 
         [Authorize]
-        public static async Task<Results<Ok<ParkInfo>, BadRequest, NotFound>> PostPark(int id, ParkForm parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
+        public static async Task<Results<Ok<ParkInfo>, BadRequest<string>, NotFound>> PostPark(int id, ParkForm parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var carPark = db.CarParks.Include(c => c.carSpots).FirstOrDefault(carPark => carPark.Id == id);
 
             var user = await userManager.GetUserAsync(ctx.User);
 
             if (user.Battery == 0)
-                return TypedResults.BadRequest();
+                return TypedResults.BadRequest("User battery is not defined");
 
 
             var freeSpot = carPark.carSpots.FirstOrDefault(s => s.EndLease < DateTime.UtcNow);
@@ -194,6 +194,11 @@ namespace ApplicazioniWeb1.Endpoints
             var batteryToCharge = (user.Battery / 100f) * (parkForm.TargetCharge - parkForm.CurrentCharge);
             var costOfCharge = carPark.ChargeRate * batteryToCharge;
             var time = batteryToCharge / carPark.Power;
+
+            if (costOfCharge + (carPark.ParkRate * parkForm.TimePark) > user.Balance)
+            {
+                return TypedResults.BadRequest("Not enough balance");
+            }
 
             db.Invoices.AddRange(new List<Invoice>
                 {

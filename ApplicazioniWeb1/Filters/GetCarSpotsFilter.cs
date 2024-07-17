@@ -13,13 +13,12 @@ namespace ApplicazioniWeb1.Filters
         }
         public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
         {
-            var page = context.GetArgument<int>(1);
-            var resultPerPage = context.GetArgument<int>(2);
+            var page = context.GetArgument<int>(0);
+            var resultPerPage = context.GetArgument<int>(1);
 
-            if (page > 0 && resultPerPage > 0)
+            if (page < 0 && resultPerPage < 0)
             {
                 return TypedResults.Problem("page and resultsPerPage must be > 0", statusCode: 404);
-
             }
 
             return await next(context);

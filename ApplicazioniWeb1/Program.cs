@@ -193,7 +193,7 @@ apiEndpoints.MapGet("/payments", InvoicesEndpoint.GetHandler).WithOpenApi(o => n
 {
     Tags = new List<OpenApiTag> { new() { Name = "Invoice" } },
     Summary = "Get payments",
-});
+}).AddEndpointFilter<GetInvoicesFilter>();
 
 apiEndpoints.MapPost("/payments/settle", InvoicesEndpoint.PostCloseHandler).WithOpenApi(o => new(o)
 {
