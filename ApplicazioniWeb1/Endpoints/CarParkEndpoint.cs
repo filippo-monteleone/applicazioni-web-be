@@ -359,11 +359,22 @@ namespace ApplicazioniWeb1.Endpoints
                 if (i.Type == "Charge")
                 {
                     var percentage = (DateTime.UtcNow - i.DateStart).TotalSeconds / ((i.DateEnd - i.DateStart).TotalSeconds / 100) / 100;
-                    toPay = (float?)((float)i.Value * percentage);
-                    step = i.Value / (i.DateEnd - i.DateStart).TotalSeconds;
-                    batteryStep = (double)(i.EndValue - i.StartValue) / (i.DateEnd - i.DateStart).TotalSeconds;
-                    var charged = batteryStep * (DateTime.UtcNow - i.DateStart).TotalSeconds;
-                    battery = (float)charged + i.StartValue;
+                    
+                    if (!Double.IsInfinity(percentage))
+                    {
+                        toPay = (float?)((float)i.Value * percentage);
+                        step = i.Value / (i.DateEnd - i.DateStart).TotalSeconds;
+                        batteryStep = (double)(i.EndValue - i.StartValue) / (i.DateEnd - i.DateStart).TotalSeconds;
+                        var charged = batteryStep * (DateTime.UtcNow - i.DateStart).TotalSeconds;
+                        battery = (float)charged + i.StartValue;
+                    } else
+                    {
+                        toPay = 0;
+                        step = 0;
+                        batteryStep = 0;
+                        battery = i.StartValue;
+                    }
+                    
                 }
                 else if (i.Type == "Parking")
                 {
