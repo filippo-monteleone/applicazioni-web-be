@@ -40,7 +40,7 @@ namespace ApplicazioniWeb1.Endpoints
             var user = await userManager.GetUserAsync(ctx.User);
             var carParks = db.CarParks.Where(c => c.OwnerId == user.Id).Select(c => c.Id.ToString());
 
-            var invoices = db.Invoices.Include(i => i.User).Where(i => carParks.Any(c => c == i.CarParkId)).ToArray();
+            var invoices = db.Invoices.Include(i => i.User).Where(i => i.OwnerId == user.Id).ToArray();
 
             List<string> parking = new();
             if (Parking)

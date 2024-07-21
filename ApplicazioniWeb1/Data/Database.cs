@@ -36,7 +36,6 @@ namespace ApplicazioniWeb1.Data
         public float ChargeRate { get; set; }
         public string Lat { get; set; }
         public string Long { get; set; }
-
         public int Power { get; set; } = 10;
 
         [JsonIgnore]
@@ -63,6 +62,7 @@ namespace ApplicazioniWeb1.Data
         [JsonIgnore]
         public ApplicationUser User { get; set; }
         public string CarParkId { get; set; }
+        public string OwnerId { get; set; }
         public float? Paid { get; set; }
         public float Value { get; set; }
         public string Type { get; set; }

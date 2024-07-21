@@ -88,7 +88,8 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                                     StartValue = book.CurrentCharge,
                                     EndValue = book.TargetCharge,
                                     CarParkId = carPark.Id.ToString(),
-                                    Pro = user.Pro
+                                    Pro = user.Pro,
+                                    OwnerId = carPark.OwnerId
                                 },
                                 new Invoice() { Type = "Parking",
                                     DateStart = DateTime.UtcNow,
@@ -97,7 +98,8 @@ namespace ApplicazioniWeb1.BackgroundWorkers
                                     Rate = carPark.ParkRate,
                                     Value = carPark.ParkRate * (book.TimePark + time),
                                     CarParkId = carPark.Id.ToString(),
-                                    Pro = user.Pro
+                                    Pro = user.Pro,
+                                    OwnerId = carPark.OwnerId
                                 },
                             });
 

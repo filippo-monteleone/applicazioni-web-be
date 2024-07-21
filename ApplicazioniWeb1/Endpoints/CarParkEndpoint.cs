@@ -212,7 +212,8 @@ namespace ApplicazioniWeb1.Endpoints
                         StartValue = parkForm.CurrentCharge,
                         EndValue = parkForm.TargetCharge,
                         CarParkId = id.ToString(),
-                        Pro = user.Pro
+                        Pro = user.Pro,
+                        OwnerId = carPark.OwnerId
                     },
                     new Invoice() { Type = "Parking",
                         DateStart = DateTime.UtcNow,
@@ -221,7 +222,8 @@ namespace ApplicazioniWeb1.Endpoints
                         Rate = carPark.ParkRate,
                         Value = carPark.ParkRate * parkForm.TimePark,
                         CarParkId = id.ToString(),
-                        Pro = user.Pro
+                        Pro = user.Pro,
+                        OwnerId = carPark.OwnerId
                     },
                 }) ;
 
