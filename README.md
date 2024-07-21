@@ -47,7 +47,7 @@ Per la parte frontend del progetto, ho scelto di utilizzare Angular, poiché off
 
 ## Backend: Minimal API
 
-Per il backend, ho scelto di utilizzare Minimal API per creare un'API REST. Per la gestione degli utenti, ho deciso di utilizzare Identity Framework.
+Per il backend, ho scelto di utilizzare Minimal API per creare un'API REST. Per la gestione degli utenti, ho deciso di utilizzare Identity Framework. Per semplificare i test, abbiamo deciso di disabilitare temporaneamente il controllo della validità dell'email e le funzionalità di sicurezza della password fornite dal framework Identity.
 
 Ecco una breve elenco delle api e del loro uso:
 
