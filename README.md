@@ -21,6 +21,8 @@ Per il database, si utilizza PostgreSQL. Si ricorda che è necessario sostituire
 
 Successivamente, si consiglia di utilizzare Visual Studio per eseguire il backend. Per aprire la soluzione, basta aprire il file con estensione .sln in Visual Studio. Una volta che la soluzione è stata caricata e verificata, premere il tasto verde di avvio.
 
+Verificare che l'URL del dev server del FE corrisponda a quello specificato nel proxy in BuildExtension.cs. In caso contrario, modificarlo.
+
 Per il corretto funzionamento del login con OAuth, è necessario aggiungere i segreti. In Visual Studio, fai clic con il tasto destro del mouse sul progetto, seleziona "Manage User Secrets" e inserisci il seguente codice:
 
 ```
