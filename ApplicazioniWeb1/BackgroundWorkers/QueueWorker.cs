@@ -7,6 +7,9 @@ using static ApplicazioniWeb1.Endpoints.CarParkEndpoint;
 
 namespace ApplicazioniWeb1.BackgroundWorkers
 {
+    /// <summary>
+    /// A background service that processes invoices and car parking entries periodically.
+    /// </summary>
     public class QueueWorker : BackgroundService
     {
         private readonly PeriodicTimer _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
@@ -17,6 +20,11 @@ namespace ApplicazioniWeb1.BackgroundWorkers
             _serviceScopeFactory = serviceScopeFactory;
         }
 
+        /// <summary>
+        /// Executes the background service, processing invoices and car parking entries periodically.
+        /// </summary>
+        /// <param name="stoppingToken">A cancellation token to signal the service to stop.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)

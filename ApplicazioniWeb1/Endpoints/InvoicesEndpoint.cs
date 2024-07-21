@@ -8,15 +8,23 @@ using static ApplicazioniWeb1.Endpoints.CarParkEndpoint;
 
 namespace ApplicazioniWeb1.Endpoints
 {
+    /// <summary>
+    /// Endpoint for handling invoice-related operations, such as retrieving, filtering, and closing invoices.
+    /// </summary>
     public class InvoicesEndpoint
     {
-
+        /// <summary>
+        /// Represents payment details, including costs for charging and parking.
+        /// </summary>
         public class Payment
         {
             public float CostOfCharge { get; set; }
             public float CostOfPark { get; set; }
         }
 
+        /// <summary>
+        /// Represents filters for querying invoices, including date range and types of invoices.
+        /// </summary>
         public class Filter
         {
             public DateTime Start { get; set; }
@@ -27,6 +35,21 @@ namespace ApplicazioniWeb1.Endpoints
             public bool Premium { get; set; }
         }
 
+        /// <summary>
+        /// Retrieves a paginated list of invoices based on the provided filters.
+        /// </summary>
+        /// <param name="StartDate">The optional start date for filtering invoices.</param>
+        /// <param name="EndDate">The optional end date for filtering invoices.</param>
+        /// <param name="page">The page number for pagination.</param>
+        /// <param name="resultsPerPage">The number of results per page for pagination.</param>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">The user manager for accessing user information.</param>
+        /// <param name="ctx">The HTTP context.</param>
+        /// <param name="Parking">Indicates whether to include parking invoices.</param>
+        /// <param name="Charging">Indicates whether to include charging invoices.</param>
+        /// <param name="Basic">Indicates whether to include basic users.</param>
+        /// <param name="Premium">Indicates whether to include premium users.</param>
+        /// <returns>A result containing the paginated invoices.</returns>
         [Authorize(Roles = "admin")]
         public static async Task<Ok<PaginatedInvoice>> GetHandler(
             DateTime? StartDate, DateTime? EndDate,
@@ -86,6 +109,13 @@ namespace ApplicazioniWeb1.Endpoints
 
         }
 
+        /// <summary>
+        /// Closes active invoices for the current user and updates the car spot information.
+        /// </summary>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">The user manager for accessing user information.</param>
+        /// <param name="ctx">The HTTP context.</param>
+        /// <returns>A result indicating whether the operation was successful.</returns>
         [Authorize]
         public  static async Task<Results<NoContent, NotFound>> PostCloseHandler(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {

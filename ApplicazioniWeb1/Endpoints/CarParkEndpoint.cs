@@ -13,8 +13,14 @@ using static ApplicazioniWeb1.Data.QueueInfo;
 
 namespace ApplicazioniWeb1.Endpoints
 {
+    /// <summary>
+    /// The CarParkEndpoint class handles car park-related requests.
+    /// </summary>
     public class CarParkEndpoint
     {
+        /// <summary>
+        /// Represents the car park data.
+        /// </summary>
         public class CarPark
         {
             public string Name { get; set; }
@@ -26,6 +32,9 @@ namespace ApplicazioniWeb1.Endpoints
             public int Power { get; set; }
         }
 
+        /// <summary>
+        /// Represents the form data for parking.
+        /// </summary>
         public class ParkForm
         {
             public float CurrentCharge { get; set; }
@@ -34,12 +43,24 @@ namespace ApplicazioniWeb1.Endpoints
             public float TimePark { get; set; }
         }
 
+        /// <summary>
+        /// Represents the form data for updating parking rates of a carpark.
+        /// </summary>
         public class UpdatePark
         {
             public float ParkRate { get; set; }
             public float ChargeRate { get; set; }
         }
 
+        /// <summary>
+        /// Handles the request to update the parking rates of a car park.
+        /// </summary>
+        /// <param name="id">The ID of the car park to update.</param>
+        /// <param name="parkForm">An instance of <see cref="UpdatePark"/> containing the new rates.</param>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/> used to manage user-related operations.</param>
+        /// <param name="ctx">The current <see cref="HttpContext"/> instance.</param>
+        /// <returns>A <see cref="Results{TResult1, TResult2}"/> indicating the outcome of the request, either NoContent or BadRequest.</returns>
         [Authorize(Roles = "admin")]
         public static async Task<Results<NoContent, BadRequest>> PutPark(int id, UpdatePark parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
@@ -55,7 +76,14 @@ namespace ApplicazioniWeb1.Endpoints
             return TypedResults.NoContent();
         }
 
-
+        /// <summary>
+        /// Handles the request to add a new car park.
+        /// </summary>
+        /// <param name="carPark">An instance of <see cref="CarPark"/> containing the car park data.</param>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/> used to manage user-related operations.</param>
+        /// <param name="ctx">The current <see cref="HttpContext"/> instance.</param>
+        /// <returns>A <see cref="Results{TResult1, TResult2}"/> indicating the outcome of the request, either Created or BadRequest.</returns>
         [Authorize(Roles = "admin")]
         public static async Task<Results<Created, BadRequest>> PostHandler(CarPark carPark, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
@@ -82,7 +110,14 @@ namespace ApplicazioniWeb1.Endpoints
             return TypedResults.Created();
         }
 
-
+        /// <summary>
+        /// Handles the request to get a list of car parks.
+        /// </summary>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/> used to manage user-related operations.</param>
+        /// <param name="ctx">The current <see cref="HttpContext"/> instance.</param>
+        /// <param name="me">A boolean indicating whether to return only the car parks owned by the current user.</param>
+        /// <returns>An <see cref="Ok{T}"/> result containing the list of car parks.</returns>
         [Authorize]
         public static async Task<Ok<List<CarParkDto>>> GetHandler(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx, [FromQuery] bool me = false) {
             var user = await userManager.GetUserAsync(ctx.User);
@@ -108,6 +143,14 @@ namespace ApplicazioniWeb1.Endpoints
             return TypedResults.Ok(carParksDto);
         }
 
+        /// <summary>
+        /// Handles the request to delete a car park.
+        /// </summary>
+        /// <param name="id">The ID of the car park to delete.</param>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/> used to manage user-related operations.</param>
+        /// <param name="ctx">The current <see cref="HttpContext"/> instance.</param>
+        /// <returns>An <see cref="Ok"/> result indicating the outcome of the request.</returns>
         [Authorize(Roles = "admin")]
         public static async Task<Ok> DeleteHandler(int id, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
@@ -127,6 +170,16 @@ namespace ApplicazioniWeb1.Endpoints
             return TypedResults.Ok();
         }
 
+        /// <summary>
+        /// Handles the request to get a paginated list of car spots in a car park.
+        /// </summary>
+        /// <param name="id">The ID of the car park.</param>
+        /// <param name="page">The page number to retrieve.</param>
+        /// <param name="resultsPerPage">The number of results per page.</param>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/> used to manage user-related operations.</param>
+        /// <param name="ctx">The current <see cref="HttpContext"/> instance.</param>
+        /// <returns>A <see cref="Results{TResult1, TResult2}"/> indicating the outcome of the request, either Ok or NotFound.</returns>
         [Authorize(Roles = "admin")]
         public static async Task<Results<Ok<PaginatedCarSpots>, NotFound>> GetCarSpotHandler(int id, [FromQuery] int page, [FromQuery] int resultsPerPage, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
@@ -158,6 +211,15 @@ namespace ApplicazioniWeb1.Endpoints
             });
         }
 
+        /// <summary>
+        /// Handles the request to park a car in a car park.
+        /// </summary>
+        /// <param name="id">The ID of the car park.</param>
+        /// <param name="parkForm">An instance of <see cref="ParkForm"/> containing the parking details.</param>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/> used to manage user-related operations.</param>
+        /// <param name="ctx">The current <see cref="HttpContext"/> instance.</param>
+        /// <returns>A <see cref="Results{TResult1, TResult2, TResult3}"/> indicating the outcome of the request, either Ok, BadRequest, or NotFound.</returns>
         [Authorize]
         public static async Task<Results<Ok<ParkInfo>, BadRequest<string>, NotFound>> PostPark(int id, ParkForm parkForm, Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
@@ -241,6 +303,14 @@ namespace ApplicazioniWeb1.Endpoints
             });
         }
 
+        /// <summary>
+        /// Handles server-sent events for parking updates.
+        /// </summary>
+        /// <param name="ctx">The current <see cref="HttpContext"/> instance.</param>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/> used to manage user-related operations.</param>
+        /// <param name="token">A <see cref="CancellationToken"/> used to cancel the task.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public static async Task ParkUpdateSse(HttpContext ctx, Database db, UserManager<ApplicationUser> userManager, CancellationToken token)
         {
             ctx.Response.Headers.Add("Content-Type", "text/event-stream");
@@ -293,6 +363,12 @@ namespace ApplicazioniWeb1.Endpoints
             }
         }
 
+        /// <summary>
+        /// Handles the request to get the queue of a car park.
+        /// </summary>
+        /// <param name="id">The ID of the car park.</param>
+        /// <param name="db">The database context.</param>
+        /// <returns>A <see cref="Results{TResult1, TResult2}"/> indicating the outcome of the request, either Ok or NotFound.</returns>
         public static async Task<Results<Ok<QueueInfo>, NotFound>> GetParkQueue(int id, Database db)
         {
             var carPark = db.CarParks.Where(c => c.Id == id);
@@ -314,6 +390,13 @@ namespace ApplicazioniWeb1.Endpoints
             return TypedResults.Ok(new QueueInfo { Queue = books });
         }
 
+        /// <summary>
+        /// Handles the request to get the current parking status of the user.
+        /// </summary>
+        /// <param name="db">The database context.</param>
+        /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/> used to manage user-related operations.</param>
+        /// <param name="ctx">The current <see cref="HttpContext"/> instance.</param>
+        /// <returns>A <see cref="Results{TResult1, TResult2}"/> indicating the outcome of the request, either Ok or NotFound.</returns>
         public static async Task<Results<Ok<CurrentPark>, NotFound>> GetCurrentPark(Database db, UserManager<ApplicationUser> userManager, HttpContext ctx)
         {
             var user = await userManager.GetUserAsync(ctx.User);
