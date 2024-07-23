@@ -22,8 +22,8 @@ Per esempio per avviarlo con docker eseguire i seguenti comandi (Altrimenti usar
 4. ``` CREATE DATABASE WebApp; ``` (comando postgresql per creare il database)
 
 Infine eseguire i seguenti comandi nel package manager in visual studio:
-1. ```Add-Migration <nome>```
-2. ```Update-Database``
+1. ```Add-Migration <nome> ```
+2. ```Update-Database```
 
 Successivamente, si consiglia di utilizzare Visual Studio per eseguire il backend. Per aprire la soluzione, basta aprire il file con estensione .sln in Visual Studio. Una volta che la soluzione è stata caricata e verificata, premere il tasto verde di avvio.
 
