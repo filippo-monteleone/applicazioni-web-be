@@ -12,12 +12,18 @@ Una volta verificata l'installazione di Node.js, puoi iniziare a configurare il 
 2. Installa Angular CLI globalmente con questo comando: ```npm install -g @angular/cli``` 
 3. Avvia il sito eseguendo questo comando: ```ng serve```
 
-Per il database, si utilizza PostgreSQL. Si ricorda che è necessario sostituire la connection string nel file appsettings con le proprie impostazioni come l’host, la porta, il nome del DB, l’username e la password. Infine eseguire i seguenti comandi:
+Per il database, si utilizza PostgreSQL. Si ricorda che è necessario sostituire la connection string nel file appsettings con le proprie impostazioni come l’host, la porta, il nome del DB, l’username e la password. 
 
+Per esempio per avviarlo con docker eseguire i seguenti comandi (Altrimenti usare pgAdmin):
+1. ```docker run --name web-postgress -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres``` (comando per creare un container di postgres)
+   - ```-e POSTGRES_PASSWORD=mysecretpassword``` definisce la password del database
+2. ``` docker exec -it web-postgress /bin/bash ``` (comando per accedere alla comandline del container)
+3. ``` psql -U postgres -W ``` (per accedere alla CLI di postgres, dopo segue l'inserimento della password)
+4. ``` CREATE DATABASE WebApp; ``` (comando postgresql per creare il database)
 
-
+Infine eseguire i seguenti comandi nel package manager in visual studio:
 1. ```Add-Migration <nome>```
-2. ```Update-Database```
+2. ```Update-Database``
 
 Successivamente, si consiglia di utilizzare Visual Studio per eseguire il backend. Per aprire la soluzione, basta aprire il file con estensione .sln in Visual Studio. Una volta che la soluzione è stata caricata e verificata, premere il tasto verde di avvio.
 
